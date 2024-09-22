@@ -1,0 +1,8 @@
+# ./serverless.yml
+
+service: youtube-embed-parser
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+  - serverless-plugin-typescript
