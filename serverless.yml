@@ -2,7 +2,19 @@
 
 service: youtube-embed-parser
 
+provider:
+  name: aws
+  runtime: nodejs20.x
+
 plugins:
   - serverless-esbuild
   - serverless-offline
-  - serverless-plugin-typescript
+
+
+functions:
+  myFunction:
+    handler: index.handler
+    events:
+      - http:
+          path: /
+          method: post

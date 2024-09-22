@@ -1,9 +1,13 @@
 import type {
-} from "@aws-sdk/types";
-
+    APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayEventRequestContext
+} from "aws-lambda";
 import { getPlayerVarsEmbed } from "./youtubeUtils";
 
-const handler = async () => {
+export const handler = async (event: APIGatewayProxyEvent, context: APIGatewayEventRequestContext): Promise<APIGatewayProxyResult> => {
     const playerVars = await getPlayerVarsEmbed("s2ZWciC68tQ");
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify(playerVars),
+    };
 };
-handler();
