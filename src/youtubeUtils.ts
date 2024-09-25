@@ -32,18 +32,14 @@ export const getYTConfigEmbed = (vid: string): Promise<YouTubeConfigure> => new 
     }).on("error", (err) => reject(err));
 });
 
-export const getPlayerVarsEmbed = async (vid: string): Promise<PlayerVars> => {
+export const getPlayerVarsEmbed = async (vid: string): Promise<EmbeddedPlayerResponse> => {
     const ytcfg: any = await getYTConfigEmbed(vid);
 
     if (!("PLAYER_VARS" in ytcfg) || !("embedded_player_response" in ytcfg["PLAYER_VARS"])) throw Error("not found player");
 
     try {
-        console.log(ytcfg["PLAYER_VARS"]["embedded_player_response"]);
         const res = JSON.parse(ytcfg["PLAYER_VARS"]["embedded_player_response"]);
-        return {
-            embedded_player_response: res,
-            video_id: ytcfg["PLAYER_VARS"]["video_id"] || "",
-        };
+        return res;
     } catch (e) {
         throw Error('failed parser');
     }

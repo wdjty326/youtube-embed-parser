@@ -3,8 +3,15 @@ import type {
 } from "aws-lambda";
 import { getPlayerVarsEmbed } from "./youtubeUtils";
 
-export const handler = async (event: APIGatewayProxyEvent, context: APIGatewayEventRequestContext): Promise<APIGatewayProxyResult> => {
-    const playerVars = await getPlayerVarsEmbed("s2ZWciC68tQ");
+export const handler = async (event: APIGatewayProxyEvent, _?: APIGatewayEventRequestContext): Promise<APIGatewayProxyResult> => {
+    const queryStringParameters = event.queryStringParameters;
+    if (!queryStringParameters) {
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ msg: '' })
+        }
+    }
+    const playerVars = await getPlayerVarsEmbed(queryStringParameters['v'] || '');
 
     return {
         statusCode: 200,
