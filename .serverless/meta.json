@@ -1,0 +1,126 @@
+{
+  "D:\\youtube-embed-parser": {
+    "versionSfCore": null,
+    "versionFramework": "4.4.4",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeResolverProviders": {
+      "default-aws-credential-resolver": "<REDACTED>"
+    },
+    "composeServiceName": null,
+    "servicePath": "D:\\youtube-embed-parser",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "youtube-embed-parser",
+      "build": {
+        "esbuild": false
+      },
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs20.x",
+        "region": "ap-northeast-2",
+        "stage": "dev",
+        "iam": {
+          "role": {
+            "statements": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "Resource": "arn:aws:logs:*:*:*"
+              }
+            ]
+          }
+        },
+        "versionFunctions": true
+      },
+      "functions": {
+        "parseYoutubeEmbed": {
+          "handler": "index.handler",
+          "events": [
+            {
+              "http": {
+                "path": "youtube/parse",
+                "method": "post"
+              }
+            }
+          ]
+        }
+      },
+      "package": {
+        "exclude": [
+          "node_modules/**"
+        ]
+      },
+      "plugins": [
+        "serverless-offline",
+        "serverless-plugin-typescript"
+      ]
+    },
+    "serviceRawFile": "service: youtube-embed-parser  # 서비스 이름\r\n\r\nbuild:\r\n  esbuild: false\r\n# build:\r\n#   esbuild:\r\n#     bundle: true\r\n#     minify: false\r\n#     external:\r\n#       - 'aws-lambda'\r\n#     exclude:\r\n#       - '@aws-sdk/*'\r\n#       - '!@aws-sdk/client-bedrock-runtime'\r\n#     packages: external\r\n\r\nprovider:\r\n  name: aws  # AWS 사용\r\n  runtime: nodejs20.x  # Node.js 20 버전 사용\r\n  region: ap-northeast-2  # 기본 리전 설정 (원하는 리전으로 수정 가능)\r\n  stage: dev  # 배포 단계 (development 단계)\r\n\r\n  iam:\r\n    role:\r\n      statements:  # Lambda가 필요한 IAM 권한 추가\r\n        - Effect: Allow\r\n          Action:\r\n            - logs:CreateLogGroup\r\n            - logs:CreateLogStream\r\n            - logs:PutLogEvents\r\n          Resource: arn:aws:logs:*:*:*\r\n\r\nfunctions:\r\n  parseYoutubeEmbed:  # Lambda 함수 이름\r\n    handler: index.handler  # 함수 핸들러 정의 (handler.js 파일 내에 parseYoutubeEmbed 함수 사용)\r\n    events:\r\n      - http:\r\n          path: youtube/parse  # API Gateway로 Lambda 함수를 트리거하는 HTTP 경로\r\n          method: post  # HTTP 메서드 (GET)\r\n\r\npackage:\r\n  exclude:\r\n    - node_modules/**\r\n\r\nplugins:\r\n  - serverless-offline\r\n  - serverless-plugin-typescript",
+    "command": [
+      "create"
+    ],
+    "options": {
+      "template": "aws-nodejs-typescript"
+    },
+    "error": {
+      "message": "The \"create\" command was deprecated in v4. To create a new project, run the \"serverless\" command instead.",
+      "code": "UNRECOGNIZED_CLI_COMMAND"
+    },
+    "params": {},
+    "machineId": "bb1f98bb375909b0e75a6ef39eded500",
+    "stage": "dev",
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "0358f301-b0b5-4f09-878d-39a4ea4ea162",
+    "orgName": "tyjeong",
+    "userId": "C81GQLr70vr2Tndz1B",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "tyjeong",
+    "subscription": null,
+    "userEmail": "wdjty326@gmail.com",
+    "serviceProviderAwsRegion": "ap-northeast-2",
+    "serviceProviderAwsCredentials": "<REDACTED>",
+    "serviceProviderAwsAccountId": "012547730306",
+    "projectType": "traditional",
+    "versionSf": "4.4.4",
+    "serviceProviderAwsCfStackName": "youtube-embed-parser-dev",
+    "serviceUniqueId": "arn:aws:cloudformation:ap-northeast-2:012547730306:stack/youtube-embed-parser-dev/e14806fd-060c-4144-99ee-8c20fb8e88bd",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:ap-northeast-2:012547730306:stack/youtube-embed-parser-dev/e14806fd-060c-4144-99ee-8c20fb8e88bd",
+    "serviceProviderAwsCfStackCreated": "2024-10-05T12:28:56.930Z",
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": "CREATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "ParseYoutubeEmbedLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-northeast-2:012547730306:function:youtube-embed-parser-dev-parseYoutubeEmbed:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-youtube-embed-parser-dev-ParseYoutubeEmbedLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServiceEndpoint",
+        "OutputValue": "https://7n5gq8fsw2.execute-api.ap-northeast-2.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-youtube-embed-parser-dev-ServiceEndpoint"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-ap-northeast-2-f16f399d-f67b",
+        "ExportName": "sls-youtube-embed-parser-dev-ServerlessDeploymentBucketName"
+      }
+    ]
+  }
+}

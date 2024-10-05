@@ -6,11 +6,20 @@ export const getYTConfigEmbed = (vid: string): Promise<YouTubeConfigure> => new 
     https.get(uri, {
         headers: {
             "accept-language": "ko-KR",
-            "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 YaApp_Android/22.50.1 YaSearchBrowser/22.50.1 BroPP/1.0 SA/3 Safari/537.36"
+            "cache-control": "no-cache",
+            "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 YaApp_Android/22.50.1 YaSearchBrowser/22.50.1 BroPP/1.0 SA/3 Safari/537.36",
+            "referer": `https://www.youtube.com/watch?v=${vid}`,
+
+            "sec-fetch-dest": "iframe",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "same-origin"
         },
     }, (res) => {
-        console.log('statusCode:', res.statusCode);
-        console.log('headers:', res.headers);
+        // tc 로직실행시 오류 방지
+        if (process.env.NODE_ENV === "production") {
+            console.log('statusCode:', res.statusCode);
+            console.log('headers:', res.headers);    
+        }
 
         const chunks: any[] = [];
         res.setEncoding("utf8");
@@ -20,7 +29,6 @@ export const getYTConfigEmbed = (vid: string): Promise<YouTubeConfigure> => new 
         res.on("end", () => {
             const result = /ytcfg\.set\((\{.+\})\);/.exec(chunks.join("")) || [];
             if (typeof result[1] !== "string") return reject(Error('not found ytcfg'));
-
             try {
                 const json = JSON.parse(result[1]);
                 resolve(json);

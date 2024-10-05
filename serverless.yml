@@ -1,20 +1,46 @@
-# ./serverless.yml
+service: youtube-embed-parser  # 서비스 이름
 
-service: youtube-embed-parser
+build:
+  esbuild: false
+# build:
+#   esbuild:
+#     bundle: true
+#     minify: false
+#     external:
+#       - 'aws-lambda'
+#     exclude:
+#       - '@aws-sdk/*'
+#       - '!@aws-sdk/client-bedrock-runtime'
+#     packages: external
 
 provider:
-  name: aws
-  runtime: nodejs20.x
+  name: aws  # AWS 사용
+  runtime: nodejs20.x  # Node.js 20 버전 사용
+  region: ap-northeast-2  # 기본 리전 설정 (원하는 리전으로 수정 가능)
+  stage: dev  # 배포 단계 (development 단계)
 
-plugins:
-  - serverless-esbuild
-  - serverless-offline
-
+  iam:
+    role:
+      statements:  # Lambda가 필요한 IAM 권한 추가
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: arn:aws:logs:*:*:*
 
 functions:
-  myFunction:
-    handler: index.handler
+  parseYoutubeEmbed:  # Lambda 함수 이름
+    handler: index.handler  # 함수 핸들러 정의 (handler.js 파일 내에 parseYoutubeEmbed 함수 사용)
     events:
       - http:
-          path: /
-          method: post
+          path: youtube/parse  # API Gateway로 Lambda 함수를 트리거하는 HTTP 경로
+          method: post  # HTTP 메서드 (GET)
+
+package:
+  exclude:
+    - node_modules/**
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
