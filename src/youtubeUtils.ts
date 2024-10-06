@@ -1,5 +1,48 @@
 import https from "https";
 
+/**
+ * 영상 제목을 가져옵니다.
+ * @param data 
+ * @returns 
+ */
+export const getTitle = (data: EmbeddedPlayerResponse) => {
+    if (data.previewPlayabilityStatus?.status === 'UNPLAYABLE') return '';
+    return data.embedPreview?.thumbnailPreviewRenderer?.title.runs[0].text || '';
+};
+
+/**
+ * 영상 시간을 가져옵니다.
+ * @param data 
+ * @returns 
+ */
+export const getVideoDurationSeconds = (data: EmbeddedPlayerResponse) => {
+    if (data.previewPlayabilityStatus?.status === 'UNPLAYABLE') return -1;
+    return parseInt(data.embedPreview?.thumbnailPreviewRenderer?.videoDurationSeconds || '-1', 10);
+};
+
+/**
+ * 채널주소를 가져옵니다.
+ * @param data 
+ * @returns 
+ */
+export const getChannelID = (data: EmbeddedPlayerResponse) => {
+    if (data.previewPlayabilityStatus?.status === 'UNPLAYABLE') return '';
+    return data.embedPreview.thumbnailPreviewRenderer.videoDetails?.embeddedPlayerOverlayVideoDetailsRenderer?.expandedRenderer?.embeddedPlayerOverlayVideoDetailsExpandedRenderer?.subscribeButton?.subscribeButtonRenderer?.channelId || '';
+};
+
+/**
+ * 썸네일 정보를 가져옵니다.
+ * @param data 
+ */
+export const getThumbnail = (data: EmbeddedPlayerResponse) => {
+    if (data.previewPlayabilityStatus?.status === 'UNPLAYABLE') return '';
+    
+    const thumbnails = data.embedPreview.thumbnailPreviewRenderer.defaultThumbnail.thumbnails;
+    if (thumbnails.length === 0) return '';
+    return thumbnails[thumbnails.length - 1].url; // 가장 마지막 섬네일 가져오기
+};
+
+
 // `youtube embed` 에 대한 페이지를 가져옵니다.
 export const getYTConfigEmbed = (vid: string): Promise<YouTubeConfigure> => new Promise((resolve, reject) => {
     const uri = new URL(`https://www.youtube.com/embed/${vid}`);
@@ -18,7 +61,7 @@ export const getYTConfigEmbed = (vid: string): Promise<YouTubeConfigure> => new 
         // tc 로직실행시 오류 방지
         if (process.env.NODE_ENV === "production") {
             console.log('statusCode:', res.statusCode);
-            console.log('headers:', res.headers);    
+            console.log('headers:', res.headers);
         }
 
         const chunks: any[] = [];

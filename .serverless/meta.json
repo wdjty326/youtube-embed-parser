@@ -13,6 +13,12 @@
     "serviceConfigFileName": "serverless.yml",
     "service": {
       "service": "youtube-embed-parser",
+      "build": {
+        "esbuild": {
+          "bundle": false,
+          "minify": false
+        }
+      },
       "provider": {
         "name": "aws",
         "runtime": "nodejs20.x",
@@ -130,240 +136,27 @@
                   ]
                 }
               }
-            },
-            "ParseYoutubeEmbedLambdaFunction": {
-              "Type": "AWS::Lambda::Function",
-              "Properties": {
-                "Code": {
-                  "S3Bucket": "serverless-framework-deployments-ap-northeast-2-f16f399d-f67b",
-                  "S3Key": "serverless/youtube-embed-parser/dev/1728146749728-2024-10-05T16:45:49.728Z/youtube-embed-parser.zip"
-                },
-                "Handler": ".build/src/index.handler",
-                "Runtime": "nodejs20.x",
-                "FunctionName": "youtube-embed-parser-dev-parseYoutubeEmbed",
-                "MemorySize": 1024,
-                "Timeout": 6,
-                "Role": {
-                  "Fn::GetAtt": [
-                    "IamRoleLambdaExecution",
-                    "Arn"
-                  ]
-                }
-              },
-              "DependsOn": [
-                "ParseYoutubeEmbedLogGroup"
-              ]
-            },
-            "ParseYoutubeEmbedLambdaVersionlIzVGgdgWnEtVhMVcs6ooknl9vVX8oZzAoxd2FEM": {
-              "Type": "AWS::Lambda::Version",
-              "DeletionPolicy": "Retain",
-              "Properties": {
-                "FunctionName": {
-                  "Ref": "ParseYoutubeEmbedLambdaFunction"
-                },
-                "CodeSha256": "VH9Lf/99XmW7TRWVK6tEheX4k9TN4s2BjI0R6jmajao="
-              }
-            },
-            "ApiGatewayRestApi": {
-              "Type": "AWS::ApiGateway::RestApi",
-              "Properties": {
-                "Name": "dev-youtube-embed-parser",
-                "EndpointConfiguration": {
-                  "Types": [
-                    "EDGE"
-                  ]
-                },
-                "Policy": ""
-              }
-            },
-            "ApiGatewayResourceYoutube": {
-              "Type": "AWS::ApiGateway::Resource",
-              "Properties": {
-                "ParentId": {
-                  "Fn::GetAtt": [
-                    "ApiGatewayRestApi",
-                    "RootResourceId"
-                  ]
-                },
-                "PathPart": "youtube",
-                "RestApiId": {
-                  "Ref": "ApiGatewayRestApi"
-                }
-              }
-            },
-            "ApiGatewayResourceYoutubeParse": {
-              "Type": "AWS::ApiGateway::Resource",
-              "Properties": {
-                "ParentId": {
-                  "Ref": "ApiGatewayResourceYoutube"
-                },
-                "PathPart": "parse",
-                "RestApiId": {
-                  "Ref": "ApiGatewayRestApi"
-                }
-              }
-            },
-            "ApiGatewayMethodYoutubeParsePost": {
-              "Type": "AWS::ApiGateway::Method",
-              "Properties": {
-                "HttpMethod": "POST",
-                "RequestParameters": {},
-                "ResourceId": {
-                  "Ref": "ApiGatewayResourceYoutubeParse"
-                },
-                "RestApiId": {
-                  "Ref": "ApiGatewayRestApi"
-                },
-                "ApiKeyRequired": "<REDACTED>",
-                "AuthorizationType": "NONE",
-                "Integration": {
-                  "IntegrationHttpMethod": "POST",
-                  "Type": "AWS_PROXY",
-                  "Uri": {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "arn:",
-                        {
-                          "Ref": "AWS::Partition"
-                        },
-                        ":apigateway:",
-                        {
-                          "Ref": "AWS::Region"
-                        },
-                        ":lambda:path/2015-03-31/functions/",
-                        {
-                          "Fn::GetAtt": [
-                            "ParseYoutubeEmbedLambdaFunction",
-                            "Arn"
-                          ]
-                        },
-                        "/invocations"
-                      ]
-                    ]
-                  }
-                },
-                "MethodResponses": []
-              },
-              "DependsOn": [
-                "ParseYoutubeEmbedLambdaPermissionApiGateway"
-              ]
-            },
-            "ApiGatewayDeployment1728146745049": {
-              "Type": "AWS::ApiGateway::Deployment",
-              "Properties": {
-                "RestApiId": {
-                  "Ref": "ApiGatewayRestApi"
-                },
-                "StageName": "dev"
-              },
-              "DependsOn": [
-                "ApiGatewayMethodYoutubeParsePost"
-              ]
-            },
-            "ParseYoutubeEmbedLambdaPermissionApiGateway": {
-              "Type": "AWS::Lambda::Permission",
-              "Properties": {
-                "FunctionName": {
-                  "Fn::GetAtt": [
-                    "ParseYoutubeEmbedLambdaFunction",
-                    "Arn"
-                  ]
-                },
-                "Action": "lambda:InvokeFunction",
-                "Principal": "apigateway.amazonaws.com",
-                "SourceArn": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":execute-api:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":",
-                      {
-                        "Ref": "ApiGatewayRestApi"
-                      },
-                      "/*/*"
-                    ]
-                  ]
-                }
-              }
             }
           },
           "Outputs": {
             "ServerlessDeploymentBucketName": {
-              "Value": "serverless-framework-deployments-ap-northeast-2-f16f399d-f67b",
-              "Export": {
-                "Name": "sls-youtube-embed-parser-dev-ServerlessDeploymentBucketName"
-              }
-            },
-            "ParseYoutubeEmbedLambdaFunctionQualifiedArn": {
-              "Description": "Current Lambda function version",
-              "Value": {
-                "Ref": "ParseYoutubeEmbedLambdaVersionlIzVGgdgWnEtVhMVcs6ooknl9vVX8oZzAoxd2FEM"
-              },
-              "Export": {
-                "Name": "sls-youtube-embed-parser-dev-ParseYoutubeEmbedLambdaFunctionQualifiedArn"
-              }
-            },
-            "ServiceEndpoint": {
-              "Description": "URL of the service endpoint",
-              "Value": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "https://",
-                    {
-                      "Ref": "ApiGatewayRestApi"
-                    },
-                    ".execute-api.",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ".",
-                    {
-                      "Ref": "AWS::URLSuffix"
-                    },
-                    "/dev"
-                  ]
-                ]
-              },
-              "Export": {
-                "Name": "sls-youtube-embed-parser-dev-ServiceEndpoint"
-              }
+              "Value": "serverless-framework-deployments-ap-northeast-2-f16f399d-f67b"
             }
           }
-        },
-        "vpc": {}
+        }
       },
       "functions": {
         "parseYoutubeEmbed": {
-          "handler": ".build/src/index.handler",
+          "handler": ".build/index.handler",
           "events": [
             {
               "http": {
                 "path": "youtube/parse",
-                "method": "post",
-                "integration": "AWS_PROXY"
+                "method": "post"
               }
             }
           ],
-          "name": "youtube-embed-parser-dev-parseYoutubeEmbed",
-          "package": {},
-          "memory": 1024,
-          "timeout": 6,
-          "runtime": "nodejs20.x",
-          "vpc": {},
-          "versionLogicalId": "ParseYoutubeEmbedLambdaVersionlIzVGgdgWnEtVhMVcs6ooknl9vVX8oZzAoxd2FEM"
+          "name": "youtube-embed-parser-dev-parseYoutubeEmbed"
         }
       },
       "package": {
@@ -374,19 +167,21 @@
           "node_modules/**"
         ],
         "artifactsS3KeyDirname": "serverless/youtube-embed-parser/dev/code-artifacts",
-        "deploymentBucket": "serverless-framework-deployments-ap-northeast-2-f16f399d-f67b",
-        "artifact": "D:\\youtube-embed-parser\\.serverless\\youtube-embed-parser.zip",
-        "artifactDirectoryName": "serverless/youtube-embed-parser/dev/1728146749728-2024-10-05T16:45:49.728Z"
+        "deploymentBucket": "serverless-framework-deployments-ap-northeast-2-f16f399d-f67b"
       }
     },
-    "serviceRawFile": "service: youtube-embed-parser  # 서비스 이름\r\n\r\n# build:\r\n#   esbuild:\r\n#     # Enable or Disable bundling the function code and dependencies. (Default: true)\r\n#     bundle: false\r\n#     # Enable minifying function code. (Default: false)\r\n#     minify: false\r\n\r\n\r\nprovider:\r\n  name: aws  # AWS 사용\r\n  runtime: nodejs20.x  # Node.js 20 버전 사용\r\n  region: ap-northeast-2  # 기본 리전 설정 (원하는 리전으로 수정 가능)\r\n  stage: dev  # 배포 단계 (development 단계)\r\n\r\n  iam:\r\n    role:\r\n      statements:  # Lambda가 필요한 IAM 권한 추가\r\n        - Effect: Allow\r\n          Action:\r\n            - logs:CreateLogGroup\r\n            - logs:CreateLogStream\r\n            - logs:PutLogEvents\r\n          Resource: arn:aws:logs:*:*:*\r\n\r\nfunctions:\r\n  parseYoutubeEmbed:  # Lambda 함수 이름\r\n    handler: .build/src/index.handler  # 함수 핸들러 정의 (handler.js 파일 내에 parseYoutubeEmbed 함수 사용)\r\n    events:\r\n      - http:\r\n          path: youtube/parse  # API Gateway로 Lambda 함수를 트리거하는 HTTP 경로\r\n          method: post  # HTTP 메서드 (GET)\r\n\r\npackage:\r\n  include:\r\n    - .build/**\r\n  exclude:\r\n    - node_modules/**\r\n",
+    "serviceRawFile": "service: youtube-embed-parser  # 서비스 이름\r\n\r\nbuild:\r\n  esbuild:\r\n    # Enable or Disable bundling the function code and dependencies. (Default: true)\r\n    bundle: false\r\n    # Enable minifying function code. (Default: false)\r\n    minify: false\r\n\r\n\r\nprovider:\r\n  name: aws  # AWS 사용\r\n  runtime: nodejs20.x  # Node.js 20 버전 사용\r\n  region: ap-northeast-2  # 기본 리전 설정 (원하는 리전으로 수정 가능)\r\n  stage: dev  # 배포 단계 (development 단계)\r\n\r\n  iam:\r\n    role:\r\n      statements:  # Lambda가 필요한 IAM 권한 추가\r\n        - Effect: Allow\r\n          Action:\r\n            - logs:CreateLogGroup\r\n            - logs:CreateLogStream\r\n            - logs:PutLogEvents\r\n          Resource: arn:aws:logs:*:*:*\r\n\r\nfunctions:\r\n  parseYoutubeEmbed:  # Lambda 함수 이름\r\n    handler: .build/index.handler  # 함수 핸들러 정의 (handler.js 파일 내에 parseYoutubeEmbed 함수 사용)\r\n    events:\r\n      - http:\r\n          path: youtube/parse  # API Gateway로 Lambda 함수를 트리거하는 HTTP 경로\r\n          method: post  # HTTP 메서드 (GET)\r\n\r\npackage:\r\n  include:\r\n    - .build/**\r\n  exclude:\r\n    - node_modules/**\r\n",
     "command": [
       "deploy"
     ],
     "options": {
       "debug": "*"
     },
-    "error": null,
+    "error": {
+      "message": "ENOENT: no such file or directory, open 'D:\\youtube-embed-parser\\.serverless\\build\\package.json'",
+      "stack": "Error: ENOENT: no such file or directory, open 'D:\\youtube-embed-parser\\.serverless\\build\\package.json'\n    at async open (node:internal/fs/promises:639:25)\n    at async writeFile (node:internal/fs/promises:1212:14)\n    at async Esbuild._preparePackageJson (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\plugins\\esbuild\\index.js:901:5)\n    at async before:package:createDeploymentArtifacts (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\plugins\\esbuild\\index.js:45:11)\n    at async PluginManager.runHooks (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\classes\\plugin-manager.js:680:9)\n    at async PluginManager.invoke (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\classes\\plugin-manager.js:718:9)\n    at async PluginManager.spawn (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\classes\\plugin-manager.js:740:5)\n    at async before:deploy:deploy (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\plugins\\deploy.js:37:11)\n    at async PluginManager.runHooks (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\classes\\plugin-manager.js:680:9)\n    at async PluginManager.invoke (C:\\Users\\wdjty\\.serverless\\releases\\4.4.4\\serverless\\lib\\classes\\plugin-manager.js:718:9)",
+      "code": "ENOENT"
+    },
     "params": {},
     "machineId": "bb1f98bb375909b0e75a6ef39eded500",
     "stage": "dev",
@@ -413,16 +208,15 @@
     "projectType": "traditional",
     "versionSf": "4.4.4",
     "serviceProviderAwsCfStackName": "youtube-embed-parser-dev",
-    "integrations": {},
     "serviceUniqueId": "arn:aws:cloudformation:ap-northeast-2:012547730306:stack/youtube-embed-parser-dev/2daca86a-3986-4496-9306-30b2d37c8802",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:ap-northeast-2:012547730306:stack/youtube-embed-parser-dev/2daca86a-3986-4496-9306-30b2d37c8802",
     "serviceProviderAwsCfStackCreated": "2024-10-05T16:30:30.909Z",
-    "serviceProviderAwsCfStackUpdated": "2024-10-05T16:46:13.953Z",
+    "serviceProviderAwsCfStackUpdated": "2024-10-06T12:16:04.627Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ParseYoutubeEmbedLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:ap-northeast-2:012547730306:function:youtube-embed-parser-dev-parseYoutubeEmbed:3",
+        "OutputValue": "arn:aws:lambda:ap-northeast-2:012547730306:function:youtube-embed-parser-dev-parseYoutubeEmbed:4",
         "Description": "Current Lambda function version",
         "ExportName": "sls-youtube-embed-parser-dev-ParseYoutubeEmbedLambdaFunctionQualifiedArn"
       },

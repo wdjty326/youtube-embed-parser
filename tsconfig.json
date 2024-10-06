@@ -18,6 +18,10 @@
     ],
     "rootDir": "./"
   },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts"
+  ],
   "exclude": [
     "test/**/*.spec.ts"
   ]
