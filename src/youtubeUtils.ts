@@ -1,4 +1,27 @@
 import https from "https";
+import { YouTubeErrorCode } from "./errorCode";
+
+/**
+ * 영상 재생이 불가능한 영상인지 확인합니다.
+ * @param data 
+ * @returns 
+ */
+export const checkEmbeddedErrorScreen = (data: EmbeddedPlayerResponse) => {
+    if (!data.previewPlayabilityStatus.errorScreen || !("playerErrorMessageRenderer" in data.previewPlayabilityStatus.errorScreen)) return YouTubeErrorCode.NONE;
+
+    const playerErrorMessageRenderer = data.previewPlayabilityStatus.errorScreen.playerErrorMessageRenderer;
+    if (playerErrorMessageRenderer.reason.runs[0].text.includes('연령 제한')) return YouTubeErrorCode.LIMIT_AGE_18;
+    if (playerErrorMessageRenderer.subreason.runs[0].text.includes('동영상 소유자')) return YouTubeErrorCode.NOT_SHARE;
+    if (playerErrorMessageRenderer.subreason.runs[0].text.includes('저작권 침해 신고')) return YouTubeErrorCode.NOT_COPYRIGHT;
+    if (playerErrorMessageRenderer.subreason.runs[0].text.includes('비공개 영상')) return YouTubeErrorCode.PRIVATE_VIDEO;
+    if (playerErrorMessageRenderer.subreason.runs[0].text.includes('삭제한 동영상')) return YouTubeErrorCode.REMOVE_VIDEO;
+
+    // TODO::맴버쉽 영상 필터 필요
+
+    if (data.previewPlayabilityStatus.status === "UNPLAYABLE") return YouTubeErrorCode.UNPLAYABLE;
+
+    return YouTubeErrorCode.NONE;
+};
 
 /**
  * 영상 제목을 가져옵니다.
@@ -6,7 +29,6 @@ import https from "https";
  * @returns 
  */
 export const getTitle = (data: EmbeddedPlayerResponse) => {
-    if (data.previewPlayabilityStatus?.status === 'UNPLAYABLE') return '';
     return data.embedPreview?.thumbnailPreviewRenderer?.title.runs[0].text || '';
 };
 
@@ -16,7 +38,6 @@ export const getTitle = (data: EmbeddedPlayerResponse) => {
  * @returns 
  */
 export const getVideoDurationSeconds = (data: EmbeddedPlayerResponse) => {
-    if (data.previewPlayabilityStatus?.status === 'UNPLAYABLE') return -1;
     return parseInt(data.embedPreview?.thumbnailPreviewRenderer?.videoDurationSeconds || '-1', 10);
 };
 
@@ -26,7 +47,6 @@ export const getVideoDurationSeconds = (data: EmbeddedPlayerResponse) => {
  * @returns 
  */
 export const getChannelID = (data: EmbeddedPlayerResponse) => {
-    if (data.previewPlayabilityStatus?.status === 'UNPLAYABLE') return '';
     return data.embedPreview.thumbnailPreviewRenderer.videoDetails?.embeddedPlayerOverlayVideoDetailsRenderer?.expandedRenderer?.embeddedPlayerOverlayVideoDetailsExpandedRenderer?.subscribeButton?.subscribeButtonRenderer?.channelId || '';
 };
 
@@ -83,7 +103,7 @@ export const getYTConfigEmbed = (vid: string): Promise<YouTubeConfigure> => new 
     }).on("error", (err) => reject(err));
 });
 
-export const getPlayerVarsEmbed = async (vid: string): Promise<EmbeddedPlayerResponse> => {
+export const getEmbeddPlayerResponse = async (vid: string): Promise<EmbeddedPlayerResponse> => {
     const ytcfg: any = await getYTConfigEmbed(vid);
 
     if (!("PLAYER_VARS" in ytcfg) || !("embedded_player_response" in ytcfg["PLAYER_VARS"])) throw Error("not found player");

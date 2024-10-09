@@ -31,7 +31,9 @@ declare interface EmbeddedPlayerResponse {
         status: "OK" | "UNPLAYABLE";
         playableInEmbed: boolean;
         contextParams: string;
-        errorScreen?: PlayerErrorMessageRenderer;
+        errorScreen?: {
+            playerErrorMessageRenderer: PlayerErrorMessageRenderer;
+        };
     };
     embeddedPlayerMode: string;
     embeddedPlayerConfig: {

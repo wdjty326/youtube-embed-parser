@@ -1,7 +1,8 @@
 import type {
     APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayEventRequestContext
 } from "aws-lambda";
-import { getChannelID, getPlayerVarsEmbed, getThumbnail, getTitle, getVideoDurationSeconds } from "./youtubeUtils";
+import { checkEmbeddedErrorScreen, getChannelID, getEmbeddPlayerResponse, getThumbnail, getTitle, getVideoDurationSeconds } from "./youtubeUtils";
+import { YouTubeErrorCode } from "./errorCode";
 
 export const handler = async (event: APIGatewayProxyEvent, _?: APIGatewayEventRequestContext): Promise<APIGatewayProxyResult> => {
     const queryStringParameters = event.queryStringParameters;
@@ -12,16 +13,31 @@ export const handler = async (event: APIGatewayProxyEvent, _?: APIGatewayEventRe
         }
     }
     try {
-        const playerVars = await getPlayerVarsEmbed(queryStringParameters['v'] || '');
+        const vid = queryStringParameters['v'] || 'NO_VID';
+        const embedPlayerResponse = await getEmbeddPlayerResponse(vid);
 
-        const title = getTitle(playerVars);
-        const duration = getVideoDurationSeconds(playerVars);
-        const channelId = getChannelID(playerVars);
-        const thumbnail = getThumbnail(playerVars);
+        const code = checkEmbeddedErrorScreen(embedPlayerResponse);
+        if (code !== YouTubeErrorCode.NONE) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({
+                    vid,
+                    code,
+                }),
+            }
+        }
+
+        const title = getTitle(embedPlayerResponse);
+        const duration = getVideoDurationSeconds(embedPlayerResponse);
+        const channelId = getChannelID(embedPlayerResponse);
+        const thumbnail = getThumbnail(embedPlayerResponse);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
+                vid,
+                code,
+
                 title,
                 duration,
                 channelId,
@@ -29,7 +45,7 @@ export const handler = async (event: APIGatewayProxyEvent, _?: APIGatewayEventRe
             }),
         };
     } catch (e) {
-        console.error("playerVars", e);
+        console.error("embedPlayerResponse", e);
     }
 
     return {
