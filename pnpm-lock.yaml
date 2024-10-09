@@ -7,13 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      aws-lambda:
-        specifier: ^1.0.7
-        version: 1.0.7
-      esbuild-plugin-env:
-        specifier: ^1.1.1
-        version: 1.1.1
     devDependencies:
       '@babel/core':
         specifier: ^7.25.2
@@ -33,12 +26,18 @@ importers:
       '@types/node':
         specifier: ^22.5.5
         version: 22.5.5
+      aws-lambda:
+        specifier: ^1.0.7
+        version: 1.0.7
       babel-jest:
         specifier: ^29.7.0
         version: 29.7.0(@babel/core@7.25.2)
       esbuild:
         specifier: ^0.24.0
         version: 0.24.0
+      esbuild-plugin-env:
+        specifier: ^1.1.1
+        version: 1.1.1
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.5.5)
